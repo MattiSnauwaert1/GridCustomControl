@@ -46,10 +46,12 @@ rtl.module("GridCustomControl",["System","Classes","SysUtils","Types","WEBLib.Co
       this.FMargin = 0;
       this.FColCount = 0;
       this.FColumns = null;
+      this.testGetColumns = null;
     };
     this.$final = function () {
       this.gridDiv = undefined;
       this.FColumns = undefined;
+      this.testGetColumns = undefined;
       pas["WEBLib.Controls"].TCustomControl.$final.call(this);
     };
     this.SetMargin = function (Value) {
@@ -74,7 +76,6 @@ rtl.module("GridCustomControl",["System","Classes","SysUtils","Types","WEBLib.Co
     };
     this.UpdateElement = function () {
       this.AddControlScriptLink("https:\/\/unpkg.com\/gridjs\/dist\/gridjs.umd.js");
-      this.OpenGrid();
     };
     this.UpdateElementVisual = function () {
       var strpadding = "";
@@ -84,14 +85,39 @@ rtl.module("GridCustomControl",["System","Classes","SysUtils","Types","WEBLib.Co
         this.GetElementHandle().style.setProperty("padding",strpadding);
       };
     };
+    this.SetColCount = function (Value) {
+      var delta = 0;
+      if ((this.FColCount !== Value) && (Value >= 0)) {
+        delta = Value - this.FColCount;
+        this.FColCount = Value;
+      };
+    };
+    this.SetColumns = function (Value) {
+      this.FColumns.Assign(Value);
+    };
+    this.CreateInitialize = function () {
+      pas["WEBLib.Controls"].TCustomControl.CreateInitialize.call(this);
+      this.FPadding = 5;
+      this.FMargin = 10;
+      this.SetHeight(100);
+      this.SetWidth(550);
+      this.FColumns = $mod.TColumns.$create("Create$3",[this]);
+    };
+    this.Create$4 = function (AOwner) {
+      pas["WEBLib.Controls"].TControl.Create$1.apply(this,arguments);
+      return this;
+    };
+    this.Destroy = function () {
+      rtl.free(this,"FColumns");
+      pas["WEBLib.Controls"].TCustomControl.Destroy.call(this);
+    };
     this.OpenGrid = function () {
-      new gridjs.Grid({
-          columns: ['Name' , 'Email', 'Phone Number',
-            
-          ],
+      new gridjs.Grid().updateConfig({
+          columns: this.FColumns
+          ,
       
           data: [
-            ["John", "john@example.com", "(353) 01 222 3333"],
+            [list[0], list[1], "(353) 01 222 3333"],
             ["Mark", "mark@gmail.com", "(01) 22 888 4444"],
             ["Eoin", "eoin@gmail.com", "0097 22 654 00033"],
             ["Sarah", "sarahcdd@gmail.com", "+322 876 1233"],
@@ -123,33 +149,6 @@ rtl.module("GridCustomControl",["System","Classes","SysUtils","Types","WEBLib.Co
         // de 'this' functionaliteit
         }).render(this.gridDiv);
       this.SetColCount(this.FColCount);
-    };
-    this.SetColCount = function (Value) {
-      var delta = 0;
-      if ((this.FColCount !== Value) && (Value >= 0)) {
-        delta = Value - this.FColCount;
-        this.FColCount = Value;
-        window.console.log(this.FColCount);
-      };
-    };
-    this.SetColumns = function (Value) {
-      this.FColumns.Assign(Value);
-    };
-    this.CreateInitialize = function () {
-      pas["WEBLib.Controls"].TCustomControl.CreateInitialize.call(this);
-      this.FPadding = 5;
-      this.FMargin = 10;
-      this.SetHeight(100);
-      this.SetWidth(550);
-      this.FColumns = $mod.TColumns.$create("Create$3",[this]);
-    };
-    this.Create$4 = function (AOwner) {
-      pas["WEBLib.Controls"].TControl.Create$1.apply(this,arguments);
-      return this;
-    };
-    this.Destroy = function () {
-      rtl.free(this,"FColumns");
-      pas["WEBLib.Controls"].TCustomControl.Destroy.call(this);
     };
     rtl.addIntf(this,pas.System.IUnknown);
     var $r = this.$rtti;

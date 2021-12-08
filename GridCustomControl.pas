@@ -37,14 +37,13 @@ end;
     FMargin: integer;
     FColCount : integer;
     FColumns: TColumns;
-    
+    testGetColumns : TColumns;
     procedure SetMargin(const Value: integer);
     procedure SetPadding(const Value: integer);
    protected
     function CreateElement: TJSElement; override;  
     procedure UpdateElement; override;
     procedure UpdateElementVisual; override;   
-    procedure OpenGrid;
     procedure SetColCount(const Value: integer); virtual;
     procedure SetColumns(Value: TColumns);
 
@@ -53,6 +52,7 @@ end;
     procedure CreateInitialize; override;
     constructor Create(AOwner: TComponent); reintroduce;
     destructor Destroy; override;
+    procedure OpenGrid;
 
   published
     property Margin: integer read FMargin write SetMargin;
@@ -118,20 +118,33 @@ end;
 procedure TVbGrid.UpdateElement;
 begin
       AddControlScriptLink('https://unpkg.com/gridjs/dist/gridjs.umd.js');
-      OpenGrid;
+      //OpenGrid;
 
 end;
 
 procedure TVbGrid.OpenGrid;
+var 
+  i: Integer;
+  c: TColumnItem;
 begin
   asm
-    new gridjs.Grid({
-    columns: ['Name' , 'Email', 'Phone Number',
-      
-    ],
+    let list = [];
+  end;
+  for i := 0 to FColumns.Count -1 do
+    begin
+      c := FColumns[i];
+      asm
+        list.push(c.FColumn);
+      end;
+    end;
+    
+  asm
+    new gridjs.Grid().updateConfig({
+    columns: list
+    ,
 
     data: [
-      ["John", "john@example.com", "(353) 01 222 3333"],
+      ["John", "john@gmail.com", "(353) 01 222 3333"],
       ["Mark", "mark@gmail.com", "(01) 22 888 4444"],
       ["Eoin", "eoin@gmail.com", "0097 22 654 00033"],
       ["Sarah", "sarahcdd@gmail.com", "+322 876 1233"],
@@ -175,7 +188,7 @@ begin
     delta := Value - FColCount;
     FColCount := Value;
 
-    console.log(FColCount);
+    //console.log(FColCount);
 
     {if Assigned(ElementHandle) then
     begin
